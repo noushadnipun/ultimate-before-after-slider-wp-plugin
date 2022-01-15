@@ -1,0 +1,36 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "basfe/before-after-slider",
+	"version": "1.2.1",
+	"title": "Before After Slider",
+	"category": "media",
+	"icon": "image-flip-horizontal",
+	"description": "Compare two images with a draggable before/after slider.",
+	"keywords": [ "before", "after", "compare", "comparison", "slider" ],
+	"textdomain": "before-after-slider-for-elementor",
+	"attributes": {
+		"beforeId": { "type": "number", "default": 0 },
+		"beforeUrl": { "type": "string", "default": "" },
+		"afterId": { "type": "number", "default": 0 },
+		"afterUrl": { "type": "string", "default": "" },
+		"orientation": { "type": "string", "default": "horizontal" },
+		"offset": { "type": "number", "default": 50 },
+		"hover": { "type": "boolean", "default": false },
+		"showLabels": { "type": "boolean", "default": true },
+		"beforeLabel": { "type": "string", "default": "Before" },
+		"afterLabel": { "type": "string", "default": "After" },
+		"size": { "type": "string", "default": "large" },
+		"customWidth": { "type": "number", "default": 800 },
+		"customHeight": { "type": "number", "default": 600 },
+		"sliderAlign": { "type": "string", "default": "left" },
+		"maxWidth": { "type": "number", "default": 0 }
+	},
+	"supports": {
+		"html": false,
+		"align": [ "wide", "full" ],
+		"spacing": { "margin": true }
+	},
+	"editorScript": "file:./index.js",
+	"style": "basfe-style"
+}
