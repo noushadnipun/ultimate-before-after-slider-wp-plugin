@@ -32,7 +32,6 @@
 
 	function Preview( props ) {
 		var a = props.attributes;
-		var d = window.basfeDefaults || {};
 		var vertical = a.orientation === 'vertical';
 		var state = useState( a.offset );
 		var pos = state[ 0 ];
@@ -59,13 +58,6 @@
 		if ( a.maxWidth > 0 ) {
 			style[ '--basfe-max' ] = a.maxWidth + 'px';
 		}
-		if ( d.color ) {
-			style[ '--basfe-color' ] = d.color;
-			style[ '--basfe-icon' ] = d.icon;
-			style[ '--basfe-line' ] = d.line + 'px';
-			style[ '--basfe-knob' ] = d.knob + 'px';
-		}
-
 		var children = [
 			el( 'div', { key: 'a', className: 'basfe-img basfe-after' }, el( 'img', { src: a.afterUrl, alt: '' } ) ),
 			el( 'div', { key: 'b', className: 'basfe-img basfe-before' }, el( 'img', { src: a.beforeUrl, alt: '' } ) ),

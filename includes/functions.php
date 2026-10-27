@@ -26,6 +26,20 @@ function basfe_default_options() {
 		'icon_color'   => '#333333',
 		'line_width'   => 3,
 		'knob_size'    => 44,
+		'knob_opacity' => 100,
+
+		'label_color'       => '#ffffff',
+		'label_bg'          => '#000000',
+		'label_bg_opacity'  => 55,
+		'label_font_size'   => 14,
+		'label_font_weight' => '400',
+		'label_font_style'  => 'normal',
+		'label_pad_y'       => 4,
+		'label_pad_x'       => 10,
+		'label_top'         => 12,
+		'label_left'        => 12,
+		'label_right'       => 12,
+		'label_radius'      => 3,
 	);
 }
 
@@ -146,23 +160,9 @@ function basfe_shortcode( $atts ) {
 	$hover       = basfe_is_yes( $a['hover'] ) ? 'yes' : 'no';
 	$labels      = basfe_is_yes( $a['labels'] );
 
-	$defaults = basfe_default_options();
-	$color    = sanitize_hex_color( $o['color'] ) ? $o['color'] : $defaults['color'];
-	$icon     = sanitize_hex_color( $o['icon_color'] ) ? $o['icon_color'] : $defaults['icon_color'];
-	$line     = max( 1, min( 12, (int) $o['line_width'] ) );
-	$knob     = max( 20, min( 90, (int) $o['knob_size'] ) );
-
 	$auto  = basfe_auto_width( array( $a['before'], $a['after'] ), $size );
 	$align = in_array( $a['align'], array( 'left', 'center', 'right' ), true ) ? $a['align'] : 'left';
-
-	$style = sprintf(
-		'--basfe-pos:%s%%;--basfe-color:%s;--basfe-icon:%s;--basfe-line:%dpx;--basfe-knob:%dpx;',
-		$offset,
-		$color,
-		$icon,
-		$line,
-		$knob
-	);
+	$style = '--basfe-pos:' . $offset . '%;';
 
 	if ( $auto > 0 ) {
 		$style .= '--basfe-auto:' . (int) $auto . 'px;';
@@ -201,22 +201,6 @@ function basfe_register_block() {
 	register_block_type(
 		BASFE_PATH . 'blocks/before-after-slider',
 		array( 'render_callback' => 'basfe_render_block' )
-	);
-
-	$o = basfe_get_options();
-	$d = basfe_default_options();
-
-	$data = array(
-		'color' => sanitize_hex_color( $o['color'] ) ? $o['color'] : $d['color'],
-		'icon'  => sanitize_hex_color( $o['icon_color'] ) ? $o['icon_color'] : $d['icon_color'],
-		'line'  => max( 1, min( 12, (int) $o['line_width'] ) ),
-		'knob'  => max( 20, min( 90, (int) $o['knob_size'] ) ),
-	);
-
-	wp_add_inline_script(
-		generate_block_asset_handle( 'basfe/before-after-slider', 'editorScript' ),
-		'window.basfeDefaults = ' . wp_json_encode( $data ) . ';',
-		'before'
 	);
 }
 
@@ -270,4 +254,90 @@ function basfe_render_block( $attributes ) {
 	}
 
 	return '<div ' . get_block_wrapper_attributes() . '>' . $html . '</div>';
+}
+
+/**
+ * Validate and sanitize the full options array.
+ *
+ * @param mixed $in Raw input.
+ * @return array
+ */
+function basfe_sanitize_options( $in ) {
+	$d   = basfe_default_options();
+	$in  = is_array( $in ) ? $in : array();
+	$out = array();
+
+	$int = function ( $key, $min, $max ) use ( $in, $d ) {
+		return isset( $in[ $key ] ) ? max( $min, min( $max, (int) $in[ $key ] ) ) : $d[ $key ];
+	};
+	$hex = function ( $key ) use ( $in, $d ) {
+		$c = isset( $in[ $key ] ) ? sanitize_hex_color( $in[ $key ] ) : '';
+		return $c ? $c : $d[ $key ];
+	};
+
+	$out['orientation']  = ( isset( $in['orientation'] ) && 'vertical' === $in['orientation'] ) ? 'vertical' : 'horizontal';
+	$out['offset']       = $int( 'offset', 0, 100 );
+	$out['hover']        = empty( $in['hover'] ) ? 0 : 1;
+	$out['show_labels']  = empty( $in['show_labels'] ) ? 0 : 1;
+	$out['before_label'] = isset( $in['before_label'] ) ? sanitize_text_field( $in['before_label'] ) : $d['before_label'];
+	$out['after_label']  = isset( $in['after_label'] ) ? sanitize_text_field( $in['after_label'] ) : $d['after_label'];
+
+	$out['color']        = $hex( 'color' );
+	$out['icon_color']   = $hex( 'icon_color' );
+	$out['line_width']   = $int( 'line_width', 1, 12 );
+	$out['knob_size']    = $int( 'knob_size', 20, 90 );
+	$out['knob_opacity'] = $int( 'knob_opacity', 0, 100 );
+
+	$out['label_color']      = $hex( 'label_color' );
+	$out['label_bg']         = $hex( 'label_bg' );
+	$out['label_bg_opacity'] = $int( 'label_bg_opacity', 0, 100 );
+	$out['label_font_size']  = $int( 'label_font_size', 8, 48 );
+	$out['label_pad_y']      = $int( 'label_pad_y', 0, 50 );
+	$out['label_pad_x']      = $int( 'label_pad_x', 0, 50 );
+	$out['label_top']        = $int( 'label_top', 0, 200 );
+	$out['label_left']       = $int( 'label_left', 0, 200 );
+	$out['label_right']      = $int( 'label_right', 0, 200 );
+	$out['label_radius']     = $int( 'label_radius', 0, 50 );
+
+	$weights                  = array( '300', '400', '500', '600', '700', '800' );
+	$out['label_font_weight'] = ( isset( $in['label_font_weight'] ) && in_array( (string) $in['label_font_weight'], $weights, true ) ) ? (string) $in['label_font_weight'] : $d['label_font_weight'];
+	$out['label_font_style']  = ( isset( $in['label_font_style'] ) && 'italic' === $in['label_font_style'] ) ? 'italic' : 'normal';
+
+	return $out;
+}
+
+/**
+ * Global CSS variables built from the settings page.
+ * Elementor controls override these per widget.
+ *
+ * @return string
+ */
+function basfe_global_css() {
+	$o = basfe_sanitize_options( basfe_get_options() );
+
+	$vars = array(
+		'--basfe-color'            => $o['color'],
+		'--basfe-icon'             => $o['icon_color'],
+		'--basfe-line'             => $o['line_width'] . 'px',
+		'--basfe-knob'             => $o['knob_size'] . 'px',
+		'--basfe-knob-opacity'     => $o['knob_opacity'] . '%',
+		'--basfe-label-color'      => $o['label_color'],
+		'--basfe-label-bg'         => $o['label_bg'],
+		'--basfe-label-bg-opacity' => $o['label_bg_opacity'] . '%',
+		'--basfe-label-size'       => $o['label_font_size'] . 'px',
+		'--basfe-label-weight'     => $o['label_font_weight'],
+		'--basfe-label-style'      => $o['label_font_style'],
+		'--basfe-label-pad-y'      => $o['label_pad_y'] . 'px',
+		'--basfe-label-pad-x'      => $o['label_pad_x'] . 'px',
+		'--basfe-label-top'        => $o['label_top'] . 'px',
+		'--basfe-label-left'       => $o['label_left'] . 'px',
+		'--basfe-label-right'      => $o['label_right'] . 'px',
+		'--basfe-label-radius'     => $o['label_radius'] . 'px',
+	);
+
+	$css = '';
+	foreach ( $vars as $name => $value ) {
+		$css .= $name . ':' . $value . ';';
+	}
+	return ':root{' . $css . '}';
 }

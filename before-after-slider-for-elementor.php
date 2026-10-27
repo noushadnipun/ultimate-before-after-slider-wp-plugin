@@ -2,7 +2,7 @@
 /**
  * Plugin Name:       Before After Slider for Elementor
  * Description:       A lightweight, accessible before/after image comparison slider. Elementor widget plus a shortcode that works anywhere.
- * Version:           1.2.1
+ * Version:           1.3.0
  * Requires at least: 6.3
  * Requires PHP:      7.4
  * Author:            Noushad Nipun
@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'BASFE_VERSION', '1.2.1' );
+define( 'BASFE_VERSION', '1.3.0' );
 define( 'BASFE_FILE', __FILE__ );
 define( 'BASFE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'BASFE_URL', plugin_dir_url( __FILE__ ) );
@@ -41,6 +41,7 @@ add_action( 'elementor/widgets/register', 'basfe_register_widget' );
 function basfe_register_assets() {
 	$deps = defined( 'ELEMENTOR_VERSION' ) ? array( 'elementor-frontend' ) : array();
 	wp_register_style( 'basfe-style', BASFE_URL . 'assets/css/style.css', array(), BASFE_VERSION );
+	wp_add_inline_style( 'basfe-style', basfe_global_css() );
 	// Used by the Elementor widget.
 	wp_register_script( 'basfe-script', BASFE_URL . 'assets/js/script.js', $deps, BASFE_VERSION, true );
 	// Used by the shortcode and the block (no Elementor dependency).

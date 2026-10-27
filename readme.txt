@@ -1,10 +1,10 @@
-===Ultimate Before After Wp Slider ===
-Contributors: noushadnipun
+=== Before After Slider for Elementor ===
+Contributors: yourwporgusername
 Tags: elementor, before after, image comparison, slider, widget
 Requires at least: 6.3
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 1.2.1
+Stable tag: 1.3.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -21,7 +21,8 @@ Adds a "Before After Slider" block for the block editor, a widget for Elementor,
 * Keyboard accessible (arrow keys, Home, End)
 * Custom starting position
 * Optional Before/After labels with custom text
-* Style controls: handle color, line width, knob size, labels, border radius
+* Global style settings (handle, knob opacity, label badge style) that every slider inherits
+* Per-widget style overrides in Elementor
 * No jQuery dependency for the slider, no external requests, no tracking
 * Assets load only on pages that use the widget
 
@@ -56,6 +57,11 @@ No.
 Use images with the same aspect ratio for the best result.
 
 == Changelog ==
+
+= 1.3.0 =
+* Global styling for labels (background color and opacity, padding, top/left/right position, font size, weight, style, radius) and knob opacity in Settings > Before After Slider.
+* Elementor controls now override the global values; leave empty to inherit.
+* Block and shortcode follow the global style.
 
 = 1.2.1 =
 * The slider now displays at the selected image size instead of always filling its container.

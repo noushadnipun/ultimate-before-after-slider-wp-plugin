@@ -29,35 +29,6 @@ function basfe_action_links( $links ) {
 	return $links;
 }
 
-/**
- * Sanitize all options.
- *
- * @param mixed $in Raw input.
- * @return array
- */
-function basfe_sanitize_options( $in ) {
-	$d   = basfe_default_options();
-	$in  = is_array( $in ) ? $in : array();
-	$out = array();
-
-	$out['orientation']  = ( isset( $in['orientation'] ) && 'vertical' === $in['orientation'] ) ? 'vertical' : 'horizontal';
-	$out['offset']       = isset( $in['offset'] ) ? max( 0, min( 100, (int) $in['offset'] ) ) : $d['offset'];
-	$out['hover']        = empty( $in['hover'] ) ? 0 : 1;
-	$out['show_labels']  = empty( $in['show_labels'] ) ? 0 : 1;
-	$out['before_label'] = isset( $in['before_label'] ) ? sanitize_text_field( $in['before_label'] ) : $d['before_label'];
-	$out['after_label']  = isset( $in['after_label'] ) ? sanitize_text_field( $in['after_label'] ) : $d['after_label'];
-
-	$color             = isset( $in['color'] ) ? sanitize_hex_color( $in['color'] ) : '';
-	$icon              = isset( $in['icon_color'] ) ? sanitize_hex_color( $in['icon_color'] ) : '';
-	$out['color']      = $color ? $color : $d['color'];
-	$out['icon_color'] = $icon ? $icon : $d['icon_color'];
-
-	$out['line_width'] = isset( $in['line_width'] ) ? max( 1, min( 12, (int) $in['line_width'] ) ) : $d['line_width'];
-	$out['knob_size']  = isset( $in['knob_size'] ) ? max( 20, min( 90, (int) $in['knob_size'] ) ) : $d['knob_size'];
-
-	return $out;
-}
-
 function basfe_register_settings() {
 	register_setting(
 		'basfe_settings_group',
@@ -69,28 +40,52 @@ function basfe_register_settings() {
 		)
 	);
 
-	add_settings_section(
-		'basfe_main',
-		__( 'Default settings for the shortcode', 'before-after-slider-for-elementor' ),
-		'basfe_section_intro',
-		'basfe-settings'
+	add_settings_section( 'basfe_main', __( 'Slider defaults', 'before-after-slider-for-elementor' ), 'basfe_section_intro', 'basfe-settings' );
+	add_settings_section( 'basfe_handle', __( 'Handle', 'before-after-slider-for-elementor' ), '__return_null', 'basfe-settings' );
+	add_settings_section( 'basfe_labels', __( 'Labels (Before / After badges)', 'before-after-slider-for-elementor' ), 'basfe_labels_intro', 'basfe-settings' );
+
+	$weights = array(
+		'300' => __( 'Light (300)', 'before-after-slider-for-elementor' ),
+		'400' => __( 'Normal (400)', 'before-after-slider-for-elementor' ),
+		'500' => __( 'Medium (500)', 'before-after-slider-for-elementor' ),
+		'600' => __( 'Semi-bold (600)', 'before-after-slider-for-elementor' ),
+		'700' => __( 'Bold (700)', 'before-after-slider-for-elementor' ),
+		'800' => __( 'Extra-bold (800)', 'before-after-slider-for-elementor' ),
 	);
 
-	$td     = 'before-after-slider-for-elementor';
+	// key, label, type, extra, section.
 	$fields = array(
-		array( 'orientation', __( 'Orientation', $td ), 'select', array(
-			'horizontal' => __( 'Horizontal', $td ),
-			'vertical'   => __( 'Vertical', $td ),
-		) ),
-		array( 'offset', __( 'Starting position (%)', $td ), 'number', array( 'min' => 0, 'max' => 100 ) ),
-		array( 'hover', __( 'Move on hover', $td ), 'checkbox', __( 'Slide when the mouse moves over the image', $td ) ),
-		array( 'show_labels', __( 'Labels', $td ), 'checkbox', __( 'Show Before/After labels', $td ) ),
-		array( 'before_label', __( 'Before label', $td ), 'text', array() ),
-		array( 'after_label', __( 'After label', $td ), 'text', array() ),
-		array( 'color', __( 'Line & knob color', $td ), 'color', array() ),
-		array( 'icon_color', __( 'Arrow color', $td ), 'color', array() ),
-		array( 'line_width', __( 'Line width (px)', $td ), 'number', array( 'min' => 1, 'max' => 12 ) ),
-		array( 'knob_size', __( 'Knob size (px)', $td ), 'number', array( 'min' => 20, 'max' => 90 ) ),
+		array( 'orientation', __( 'Orientation', 'before-after-slider-for-elementor' ), 'select', array(
+			'horizontal' => __( 'Horizontal', 'before-after-slider-for-elementor' ),
+			'vertical'   => __( 'Vertical', 'before-after-slider-for-elementor' ),
+		), 'basfe_main' ),
+		array( 'offset', __( 'Starting position', 'before-after-slider-for-elementor' ), 'number', array( 'min' => 0, 'max' => 100, 'suffix' => '%' ), 'basfe_main' ),
+		array( 'hover', __( 'Move on hover', 'before-after-slider-for-elementor' ), 'checkbox', __( 'Slide when the mouse moves over the image', 'before-after-slider-for-elementor' ), 'basfe_main' ),
+		array( 'show_labels', __( 'Labels', 'before-after-slider-for-elementor' ), 'checkbox', __( 'Show Before/After labels', 'before-after-slider-for-elementor' ), 'basfe_main' ),
+		array( 'before_label', __( 'Before label text', 'before-after-slider-for-elementor' ), 'text', array(), 'basfe_main' ),
+		array( 'after_label', __( 'After label text', 'before-after-slider-for-elementor' ), 'text', array(), 'basfe_main' ),
+
+		array( 'color', __( 'Line & knob color', 'before-after-slider-for-elementor' ), 'color', array(), 'basfe_handle' ),
+		array( 'knob_opacity', __( 'Knob background opacity', 'before-after-slider-for-elementor' ), 'number', array( 'min' => 0, 'max' => 100, 'suffix' => '%' ), 'basfe_handle' ),
+		array( 'icon_color', __( 'Arrow color', 'before-after-slider-for-elementor' ), 'color', array(), 'basfe_handle' ),
+		array( 'line_width', __( 'Line width', 'before-after-slider-for-elementor' ), 'number', array( 'min' => 1, 'max' => 12, 'suffix' => 'px' ), 'basfe_handle' ),
+		array( 'knob_size', __( 'Knob size', 'before-after-slider-for-elementor' ), 'number', array( 'min' => 20, 'max' => 90, 'suffix' => 'px' ), 'basfe_handle' ),
+
+		array( 'label_color', __( 'Text color', 'before-after-slider-for-elementor' ), 'color', array(), 'basfe_labels' ),
+		array( 'label_bg', __( 'Background color', 'before-after-slider-for-elementor' ), 'color', array(), 'basfe_labels' ),
+		array( 'label_bg_opacity', __( 'Background opacity', 'before-after-slider-for-elementor' ), 'number', array( 'min' => 0, 'max' => 100, 'suffix' => '%' ), 'basfe_labels' ),
+		array( 'label_font_size', __( 'Font size', 'before-after-slider-for-elementor' ), 'number', array( 'min' => 8, 'max' => 48, 'suffix' => 'px' ), 'basfe_labels' ),
+		array( 'label_font_weight', __( 'Font weight', 'before-after-slider-for-elementor' ), 'select', $weights, 'basfe_labels' ),
+		array( 'label_font_style', __( 'Font style', 'before-after-slider-for-elementor' ), 'select', array(
+			'normal' => __( 'Normal', 'before-after-slider-for-elementor' ),
+			'italic' => __( 'Italic', 'before-after-slider-for-elementor' ),
+		), 'basfe_labels' ),
+		array( 'label_pad_y', __( 'Padding (top / bottom)', 'before-after-slider-for-elementor' ), 'number', array( 'min' => 0, 'max' => 50, 'suffix' => 'px' ), 'basfe_labels' ),
+		array( 'label_pad_x', __( 'Padding (left / right)', 'before-after-slider-for-elementor' ), 'number', array( 'min' => 0, 'max' => 50, 'suffix' => 'px' ), 'basfe_labels' ),
+		array( 'label_top', __( 'Position: top', 'before-after-slider-for-elementor' ), 'number', array( 'min' => 0, 'max' => 200, 'suffix' => 'px' ), 'basfe_labels' ),
+		array( 'label_left', __( 'Position: left', 'before-after-slider-for-elementor' ), 'number', array( 'min' => 0, 'max' => 200, 'suffix' => 'px' ), 'basfe_labels' ),
+		array( 'label_right', __( 'Position: right', 'before-after-slider-for-elementor' ), 'number', array( 'min' => 0, 'max' => 200, 'suffix' => 'px' ), 'basfe_labels' ),
+		array( 'label_radius', __( 'Border radius', 'before-after-slider-for-elementor' ), 'number', array( 'min' => 0, 'max' => 50, 'suffix' => 'px' ), 'basfe_labels' ),
 	);
 
 	foreach ( $fields as $f ) {
@@ -99,10 +94,10 @@ function basfe_register_settings() {
 			$f[1],
 			'basfe_render_field',
 			'basfe-settings',
-			'basfe_main',
+			$f[4],
 			array(
-				'key'  => $f[0],
-				'type' => $f[2],
+				'key'   => $f[0],
+				'type'  => $f[2],
 				'extra' => $f[3],
 			)
 		);
@@ -110,7 +105,11 @@ function basfe_register_settings() {
 }
 
 function basfe_section_intro() {
-	echo '<p>' . esc_html__( 'These defaults apply to the [before_after_slider] shortcode. Any value can be overridden per shortcode. The block uses its own sidebar options, but the color and size values below apply to it too. The Elementor widget uses its own controls inside the Elementor editor.', 'before-after-slider-for-elementor' ) . '</p>';
+	echo '<p>' . esc_html__( 'These are the global defaults for every slider: the Elementor widget, the block and the shortcode. In Elementor you can override any style value per widget; leave a control empty there to use the global value.', 'before-after-slider-for-elementor' ) . '</p>';
+}
+
+function basfe_labels_intro() {
+	echo '<p>' . esc_html__( 'In vertical mode the "After" label sits at the bottom, so "Position: top" is used as its bottom offset and "Position: left" as its left offset.', 'before-after-slider-for-elementor' ) . '</p>';
 }
 
 function basfe_render_field( $args ) {
@@ -135,7 +134,7 @@ function basfe_render_field( $args ) {
 				printf(
 					'<option value="%1$s" %2$s>%3$s</option>',
 					esc_attr( $val ),
-					selected( $value, $val, false ),
+					selected( (string) $value, (string) $val, false ),
 					esc_html( $label )
 				);
 			}
@@ -149,6 +148,9 @@ function basfe_render_field( $args ) {
 				(int) $extra['min'],
 				(int) $extra['max']
 			);
+			if ( ! empty( $extra['suffix'] ) ) {
+				echo ' ' . esc_html( $extra['suffix'] );
+			}
 			break;
 		case 'color':
 			printf( '<input type="color" name="%1$s" value="%2$s" />', esc_attr( $name ), esc_attr( $value ) );

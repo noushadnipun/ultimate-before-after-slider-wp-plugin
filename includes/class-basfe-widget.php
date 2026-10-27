@@ -45,13 +45,57 @@ class Basfe_Widget extends Widget_Base {
 		return array( 'basfe-script' );
 	}
 
+	private function add_info_notice( $id ) {
+		$this->add_control(
+			$id,
+			array(
+				'type'            => Controls_Manager::RAW_HTML,
+				'raw'             => sprintf(
+					'%1$s <a href="%2$s" target="_blank" rel="noopener">%3$s</a>',
+					esc_html__( 'Leave a control empty to use the global value from Settings.', 'before-after-slider-for-elementor' ),
+					esc_url( admin_url( 'options-general.php?page=basfe-settings' ) ),
+					esc_html__( 'Open global settings', 'before-after-slider-for-elementor' )
+				),
+				'content_classes' => 'elementor-panel-alert elementor-panel-alert-info',
+			)
+		);
+	}
+
+	private function add_var_slider( $id, $label, $var, $min, $max, $unit = 'px' ) {
+		$this->add_control(
+			$id,
+			array(
+				'label'      => $label,
+				'type'       => Controls_Manager::SLIDER,
+				'size_units' => array( $unit ),
+				'range'      => array(
+					$unit => array(
+						'min' => $min,
+						'max' => $max,
+					),
+				),
+				'selectors'  => array( '{{WRAPPER}} .basfe' => $var . ': {{SIZE}}{{UNIT}};' ),
+			)
+		);
+	}
+
+	private function add_var_color( $id, $label, $var ) {
+		$this->add_control(
+			$id,
+			array(
+				'label'     => $label,
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array( '{{WRAPPER}} .basfe' => $var . ': {{VALUE}};' ),
+			)
+		);
+	}
+
 	protected function register_controls() {
-		$td = 'before-after-slider-for-elementor';
 
 		$this->start_controls_section(
 			'section_images',
 			array(
-				'label' => esc_html__( 'Images', $td ),
+				'label' => esc_html__( 'Images', 'before-after-slider-for-elementor' ),
 				'tab'   => Controls_Manager::TAB_CONTENT,
 			)
 		);
@@ -59,7 +103,7 @@ class Basfe_Widget extends Widget_Base {
 		$this->add_control(
 			'before_image',
 			array(
-				'label'   => esc_html__( 'Before Image', $td ),
+				'label'   => esc_html__( 'Before Image', 'before-after-slider-for-elementor' ),
 				'type'    => Controls_Manager::MEDIA,
 				'default' => array( 'url' => Utils::get_placeholder_image_src() ),
 			)
@@ -68,7 +112,7 @@ class Basfe_Widget extends Widget_Base {
 		$this->add_control(
 			'after_image',
 			array(
-				'label'   => esc_html__( 'After Image', $td ),
+				'label'   => esc_html__( 'After Image', 'before-after-slider-for-elementor' ),
 				'type'    => Controls_Manager::MEDIA,
 				'default' => array( 'url' => Utils::get_placeholder_image_src() ),
 			)
@@ -87,7 +131,7 @@ class Basfe_Widget extends Widget_Base {
 		$this->start_controls_section(
 			'section_settings',
 			array(
-				'label' => esc_html__( 'Settings', $td ),
+				'label' => esc_html__( 'Settings', 'before-after-slider-for-elementor' ),
 				'tab'   => Controls_Manager::TAB_CONTENT,
 			)
 		);
@@ -95,12 +139,12 @@ class Basfe_Widget extends Widget_Base {
 		$this->add_control(
 			'orientation',
 			array(
-				'label'   => esc_html__( 'Orientation', $td ),
+				'label'   => esc_html__( 'Orientation', 'before-after-slider-for-elementor' ),
 				'type'    => Controls_Manager::SELECT,
 				'default' => 'horizontal',
 				'options' => array(
-					'horizontal' => esc_html__( 'Horizontal', $td ),
-					'vertical'   => esc_html__( 'Vertical', $td ),
+					'horizontal' => esc_html__( 'Horizontal', 'before-after-slider-for-elementor' ),
+					'vertical'   => esc_html__( 'Vertical', 'before-after-slider-for-elementor' ),
 				),
 			)
 		);
@@ -108,7 +152,7 @@ class Basfe_Widget extends Widget_Base {
 		$this->add_control(
 			'offset',
 			array(
-				'label'      => esc_html__( 'Starting Position (%)', $td ),
+				'label'      => esc_html__( 'Starting Position (%)', 'before-after-slider-for-elementor' ),
 				'type'       => Controls_Manager::SLIDER,
 				'size_units' => array( '%' ),
 				'range'      => array(
@@ -127,7 +171,7 @@ class Basfe_Widget extends Widget_Base {
 		$this->add_control(
 			'move_on_hover',
 			array(
-				'label'        => esc_html__( 'Move on Hover', $td ),
+				'label'        => esc_html__( 'Move on Hover', 'before-after-slider-for-elementor' ),
 				'type'         => Controls_Manager::SWITCHER,
 				'return_value' => 'yes',
 				'default'      => '',
@@ -137,7 +181,7 @@ class Basfe_Widget extends Widget_Base {
 		$this->add_control(
 			'show_labels',
 			array(
-				'label'        => esc_html__( 'Show Labels', $td ),
+				'label'        => esc_html__( 'Show Labels', 'before-after-slider-for-elementor' ),
 				'type'         => Controls_Manager::SWITCHER,
 				'return_value' => 'yes',
 				'default'      => 'yes',
@@ -147,9 +191,9 @@ class Basfe_Widget extends Widget_Base {
 		$this->add_control(
 			'before_label',
 			array(
-				'label'     => esc_html__( 'Before Label', $td ),
+				'label'     => esc_html__( 'Before Label', 'before-after-slider-for-elementor' ),
 				'type'      => Controls_Manager::TEXT,
-				'default'   => esc_html__( 'Before', $td ),
+				'default'   => esc_html__( 'Before', 'before-after-slider-for-elementor' ),
 				'condition' => array( 'show_labels' => 'yes' ),
 			)
 		);
@@ -157,9 +201,9 @@ class Basfe_Widget extends Widget_Base {
 		$this->add_control(
 			'after_label',
 			array(
-				'label'     => esc_html__( 'After Label', $td ),
+				'label'     => esc_html__( 'After Label', 'before-after-slider-for-elementor' ),
 				'type'      => Controls_Manager::TEXT,
-				'default'   => esc_html__( 'After', $td ),
+				'default'   => esc_html__( 'After', 'before-after-slider-for-elementor' ),
 				'condition' => array( 'show_labels' => 'yes' ),
 			)
 		);
@@ -170,97 +214,31 @@ class Basfe_Widget extends Widget_Base {
 		$this->start_controls_section(
 			'section_style_handle',
 			array(
-				'label' => esc_html__( 'Handle', $td ),
+				'label' => esc_html__( 'Handle', 'before-after-slider-for-elementor' ),
 				'tab'   => Controls_Manager::TAB_STYLE,
 			)
 		);
-
-		$this->add_control(
-			'handle_color',
-			array(
-				'label'     => esc_html__( 'Line & Knob Color', $td ),
-				'type'      => Controls_Manager::COLOR,
-				'default'   => '#ffffff',
-				'selectors' => array( '{{WRAPPER}} .basfe' => '--basfe-color: {{VALUE}};' ),
-			)
-		);
-
-		$this->add_control(
-			'icon_color',
-			array(
-				'label'     => esc_html__( 'Arrow Color', $td ),
-				'type'      => Controls_Manager::COLOR,
-				'default'   => '#333333',
-				'selectors' => array( '{{WRAPPER}} .basfe' => '--basfe-icon: {{VALUE}};' ),
-			)
-		);
-
-		$this->add_control(
-			'line_width',
-			array(
-				'label'      => esc_html__( 'Line Width', $td ),
-				'type'       => Controls_Manager::SLIDER,
-				'size_units' => array( 'px' ),
-				'range'      => array(
-					'px' => array(
-						'min' => 1,
-						'max' => 12,
-					),
-				),
-				'default'    => array( 'size' => 3 ),
-				'selectors'  => array( '{{WRAPPER}} .basfe' => '--basfe-line: {{SIZE}}{{UNIT}};' ),
-			)
-		);
-
-		$this->add_control(
-			'knob_size',
-			array(
-				'label'      => esc_html__( 'Knob Size', $td ),
-				'type'       => Controls_Manager::SLIDER,
-				'size_units' => array( 'px' ),
-				'range'      => array(
-					'px' => array(
-						'min' => 20,
-						'max' => 90,
-					),
-				),
-				'default'    => array( 'size' => 44 ),
-				'selectors'  => array( '{{WRAPPER}} .basfe' => '--basfe-knob: {{SIZE}}{{UNIT}};' ),
-			)
-		);
-
+		$this->add_info_notice( 'handle_notice' );
+		$this->add_var_color( 'handle_color', esc_html__( 'Line & Knob Color', 'before-after-slider-for-elementor' ), '--basfe-color' );
+		$this->add_var_slider( 'knob_opacity', esc_html__( 'Knob Background Opacity (%)', 'before-after-slider-for-elementor' ), '--basfe-knob-opacity', 0, 100, '%' );
+		$this->add_var_color( 'icon_color', esc_html__( 'Arrow Color', 'before-after-slider-for-elementor' ), '--basfe-icon' );
+		$this->add_var_slider( 'line_width', esc_html__( 'Line Width', 'before-after-slider-for-elementor' ), '--basfe-line', 1, 12 );
+		$this->add_var_slider( 'knob_size', esc_html__( 'Knob Size', 'before-after-slider-for-elementor' ), '--basfe-knob', 20, 90 );
 		$this->end_controls_section();
 
 		// Style: labels.
 		$this->start_controls_section(
 			'section_style_labels',
 			array(
-				'label'     => esc_html__( 'Labels', $td ),
+				'label'     => esc_html__( 'Labels', 'before-after-slider-for-elementor' ),
 				'tab'       => Controls_Manager::TAB_STYLE,
 				'condition' => array( 'show_labels' => 'yes' ),
 			)
 		);
-
-		$this->add_control(
-			'label_color',
-			array(
-				'label'     => esc_html__( 'Text Color', $td ),
-				'type'      => Controls_Manager::COLOR,
-				'default'   => '#ffffff',
-				'selectors' => array( '{{WRAPPER}} .basfe-label' => 'color: {{VALUE}};' ),
-			)
-		);
-
-		$this->add_control(
-			'label_bg',
-			array(
-				'label'     => esc_html__( 'Background', $td ),
-				'type'      => Controls_Manager::COLOR,
-				'default'   => 'rgba(0,0,0,0.55)',
-				'selectors' => array( '{{WRAPPER}} .basfe-label' => 'background-color: {{VALUE}};' ),
-			)
-		);
-
+		$this->add_info_notice( 'labels_notice' );
+		$this->add_var_color( 'label_color', esc_html__( 'Text Color', 'before-after-slider-for-elementor' ), '--basfe-label-color' );
+		$this->add_var_color( 'label_bg', esc_html__( 'Background Color', 'before-after-slider-for-elementor' ), '--basfe-label-bg' );
+		$this->add_var_slider( 'label_bg_opacity', esc_html__( 'Background Opacity (%)', 'before-after-slider-for-elementor' ), '--basfe-label-bg-opacity', 0, 100, '%' );
 		$this->add_group_control(
 			Group_Control_Typography::get_type(),
 			array(
@@ -268,14 +246,19 @@ class Basfe_Widget extends Widget_Base {
 				'selector' => '{{WRAPPER}} .basfe-label',
 			)
 		);
-
+		$this->add_var_slider( 'label_pad_y', esc_html__( 'Padding Top / Bottom', 'before-after-slider-for-elementor' ), '--basfe-label-pad-y', 0, 50 );
+		$this->add_var_slider( 'label_pad_x', esc_html__( 'Padding Left / Right', 'before-after-slider-for-elementor' ), '--basfe-label-pad-x', 0, 50 );
+		$this->add_var_slider( 'label_top', esc_html__( 'Position: Top', 'before-after-slider-for-elementor' ), '--basfe-label-top', 0, 200 );
+		$this->add_var_slider( 'label_left', esc_html__( 'Position: Left', 'before-after-slider-for-elementor' ), '--basfe-label-left', 0, 200 );
+		$this->add_var_slider( 'label_right', esc_html__( 'Position: Right', 'before-after-slider-for-elementor' ), '--basfe-label-right', 0, 200 );
+		$this->add_var_slider( 'label_radius', esc_html__( 'Border Radius', 'before-after-slider-for-elementor' ), '--basfe-label-radius', 0, 50 );
 		$this->end_controls_section();
 
 		// Style: image.
 		$this->start_controls_section(
 			'section_style_image',
 			array(
-				'label' => esc_html__( 'Image', $td ),
+				'label' => esc_html__( 'Image', 'before-after-slider-for-elementor' ),
 				'tab'   => Controls_Manager::TAB_STYLE,
 			)
 		);
@@ -336,7 +319,7 @@ class Basfe_Widget extends Widget_Base {
 		$this->add_control(
 			'border_radius',
 			array(
-				'label'      => esc_html__( 'Border Radius', $td ),
+				'label'      => esc_html__( 'Border Radius', 'before-after-slider-for-elementor' ),
 				'type'       => Controls_Manager::DIMENSIONS,
 				'size_units' => array( 'px', '%' ),
 				'selectors'  => array(
